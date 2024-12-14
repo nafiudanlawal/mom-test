@@ -1,13 +1,25 @@
 import Koa from "koa";
 import assert from "node:assert";
-import { beforeEach, describe, it } from "node:test";
+import { before, after, beforeEach, describe, it } from "node:test";
 import { database } from "../database";
 import { SensorsController } from "./sensors_controller";
 import { SensorsRepository } from "../repositories/sensors_repository";
 import { SensorValue, SensorValuesRepository } from "../repositories/sensor_values_repository";
 import { mean } from "../utils/mean";
+import Sinon from "sinon";
 
 describe("SensorsController", () => {
+  let clock: Sinon.SinonFakeTimers;
+  const timestamp = 1734215257638;
+
+  before(() => {
+    // Stop the clock
+    clock = Sinon.useFakeTimers({ now: timestamp });
+  });
+  after(() => {
+    clock.restore();
+  });
+
   beforeEach(() => {
     database.clear();
   });
@@ -18,16 +30,18 @@ describe("SensorsController", () => {
     }
     SensorsRepository.create({ name: "Sensor Name" });
     const sensorValue1 = {
-      timestamp: 123456789,
+      timestamp,
       sensor_id: 1,
       values: [1, 2, 3],
     }
     const sensorValue2 = {
-      timestamp: 123456790,
+      timestamp: timestamp + 100, // add 100 seconds difference
       sensor_id: 1,
       values: [5, 4, 3],
     }
     SensorValuesRepository.create(sensorValue1);
+    //add 100 seconds
+    clock.tick(100);
     SensorValuesRepository.create(sensorValue2);
 
     const ctx = { params: { id: 1 }, body: {} } as unknown as Koa.Context;
@@ -43,18 +57,16 @@ describe("SensorsController", () => {
     });
   });
 
-  it("should read return error message when sensor not found", async () => {
+  it("should return error message when sensor not found", async () => {
     if (!SensorsController.read) {
       assert.fail("SensorsController.read not implemented");
     }
     SensorsRepository.create({ name: "Sensor Name" });
     const sensorValue1 = {
-      timestamp: 123456789,
       sensor_id: 1,
       values: [1, 2, 3],
     }
     const sensorValue2 = {
-      timestamp: 123456790,
       sensor_id: 1,
       values: [5, 4, 3],
     }
@@ -65,7 +77,7 @@ describe("SensorsController", () => {
     await SensorsController.read(ctx);
 
     assert.deepEqual(ctx.body, {
-      message: "Failed to find Sensor with timestamp '15'"
+      message: "Failed to find Sensor with id '15'"
     });
   });
 

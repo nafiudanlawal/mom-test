@@ -18,8 +18,6 @@ export const SensorsController: Controller = {
 			})
 			.parse(ctx.params);
 		try {
-
-
 			const sensor = await SensorsRepository.read(id);
 			const sensorValues = await SensorValuesRepository.list(
 				(value) => value.sensor_id === id
@@ -28,7 +26,6 @@ export const SensorsController: Controller = {
 				return [
 					value.timestamp,
 					mean(value.values)
-
 				]
 			})
 
