@@ -1,9 +1,7 @@
 import { database } from "../database";
-import { autoIncrement } from "../utils/identifiers";
 import { Repository } from "./_repository";
 
 export type SensorValue = {
-  id: number;
   timestamp: number;
   sensor_id: number;
   values: number[];
@@ -18,32 +16,32 @@ export const SensorValuesRepository: Repository<SensorValue> = {
   },
 
   async create(data) {
-    const id = autoIncrement(database.sensorValues.map((value) => value.id));
+    const timestamp = Date.now();
     const value: SensorValue = {
-      id,
       ...data,
+      timestamp,
     };
     database.sensorValues.push(value);
     return value;
   },
 
-  async read(id) {
-    const value = database.sensorValues.find((value) => value.id === id);
+  async read(timestamp) {
+    const value = database.sensorValues.find((value) => value.timestamp === timestamp);
     if (!value) {
-      throw new Error(`Failed to find SensorValue with id '${id}'`);
+      throw new Error(`Failed to find SensorValue with timestamp '${timestamp}'`);
     }
     return value;
   },
 
-  async update(id, data) {
-    const index = database.sensorValues.findIndex((value) => value.id === id);
+  async update(timestamp, data) {
+    const index = database.sensorValues.findIndex((value) => value.timestamp === timestamp);
     if (!index) {
-      throw new Error(`Failed to find SensorValue with id '${id}'`);
+      throw new Error(`Failed to find SensorValue with timestamp '${timestamp}'`);
     }
-    const value = { id, ...data };
+    const value = { ...data, timestamp,  };
     database.sensorValues[index] = value;
     return value;
   },
 
-  async delete(id) {},
+  async delete(timestamp) {},
 };

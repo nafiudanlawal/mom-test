@@ -43,6 +43,32 @@ describe("SensorsController", () => {
     });
   });
 
+  it("should read return error message when sensor not found", async () => {
+    if (!SensorsController.read) {
+      assert.fail("SensorsController.read not implemented");
+    }
+    SensorsRepository.create({ name: "Sensor Name" });
+    const sensorValue1 = {
+      timestamp: 123456789,
+      sensor_id: 1,
+      values: [1, 2, 3],
+    }
+    const sensorValue2 = {
+      timestamp: 123456790,
+      sensor_id: 1,
+      values: [5, 4, 3],
+    }
+    SensorValuesRepository.create(sensorValue1);
+    SensorValuesRepository.create(sensorValue2);
+
+    const ctx = { params: { id: 15 }, body: {} } as unknown as Koa.Context;
+    await SensorsController.read(ctx);
+
+    assert.deepEqual(ctx.body, {
+      message: "Failed to find Sensor with timestamp '15'"
+    });
+  });
+
   it("should update sensors correctly", async () => {
     if (!SensorsController.update) {
       assert.fail("SensorsController.update not implemented");

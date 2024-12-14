@@ -17,23 +17,37 @@ export const SensorsController: Controller = {
 				id: z.coerce.number().nonnegative(),
 			})
 			.parse(ctx.params);
+		try {
 
-		const sensor = await SensorsRepository.read(id);
-		const sensorValues = await SensorValuesRepository.list(
-			(value) => value.sensor_id === id
-		);
-		const values = sensorValues.map(value => {
-			return[
-				value.timestamp,
-				mean(value.values)
 
-			]
-		})
+			const sensor = await SensorsRepository.read(id);
+			const sensorValues = await SensorValuesRepository.list(
+				(value) => value.sensor_id === id
+			);
+			const values = sensorValues.map(value => {
+				return [
+					value.timestamp,
+					mean(value.values)
 
-		ctx.body = {
-			...sensor,
-			values,
-		};
+				]
+			})
+
+			ctx.body = {
+				...sensor,
+				values,
+			};
+		} catch (err) {
+			ctx.status = 500;
+			if (err instanceof Error) {
+				ctx.body = {
+					message: err.message,
+				};
+			} else {
+				ctx.body = {
+					message: "An unknown error occurred.",
+				};
+			}
+		}
 	},
 
 	async update(ctx) {

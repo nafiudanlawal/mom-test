@@ -12,7 +12,6 @@ export const seed = () => {
       .map((i) => {
         SensorValuesRepository.create({
           sensor_id: 1,
-          timestamp: Date.now() - i * 100,
           values: [i, i, i],
         });
       })
