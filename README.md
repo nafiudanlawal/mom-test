@@ -18,24 +18,30 @@ This app concerns itself mostly with two concepts: `Sensors` and `SensorValues`.
 
 ## Challenges
 
-### A. Implement a delete method
+### A. Implement a delete method :heavy_check_mark:
 
 Currently, `SensorValuesRepository.delete` lacks an implementation. Implement this method and show that it actually deletes the sensor value.
 
-### B. Validation
+### B. Validation :heavy_check_mark:
 
 When updating a sensor, we allow the user to input anything they want into the `Sensor` object! Please add proper validation so this can't happen.
 
-### C. Transformation
+### C. Transformation :heavy_check_mark:
 
 In `SensorsController.read`, we don't want to return the full `SensorValue` objects. Instead we'd like to receive a concise array in the format: `[[timestamp, average of the three values], ...]`. For example, `[[123456789, 2], [123456790, 4]]`.
 
-### D. Something better than "Internal Server Error"
+### D. Something better than "Internal Server Error" :heavy_check_mark:
 
 Sometimes reading can fail, for various reasons! In `SensorsController.read`, make sure that we always return an understandable error response to the client.
 
-### E. A Different Idea
+### E. A Different Idea :heavy_check_mark:
 
 We'd like to remove the `id` from `SensorValue` objects completely, and instead use the `timestamp` as identifier for reading/writing. Creating a new `SensorValue` should use the current time.
 
 Note: The `Repository` interface is currently not fitted to accomodate this, so you will probably need to refactor some of the types there.
+
+### Change Log
+
+- Added Sinon package to simulate timer changes.
+Tests use sinon to fake timer changes.
+
