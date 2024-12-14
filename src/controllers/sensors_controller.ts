@@ -40,5 +40,16 @@ export const SensorsController: Controller = {
       ...sensor,
     };
   },
-  
+
+  async delete(ctx) {
+    const { id } = z
+      .object({
+        id: z.coerce.number().nonnegative(),
+      })
+      .parse(ctx.params);
+
+    await SensorsRepository.delete(id);
+    ctx.status = 204;
+  },
+
 };
