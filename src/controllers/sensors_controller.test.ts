@@ -66,6 +66,22 @@ describe("SensorsController", () => {
     assert.deepEqual(ctx.body, { id: 1, name: "Updated Name" });
   });
 
+  it("should update sensors with only expected data correctly", async () => {
+    if (!SensorsController.update) {
+      assert.fail("SensorsController.update not implemented");
+    }
+    SensorsRepository.create({ name: "Initial Name" });
+
+    const ctx = {
+      params: { id: 1 },
+      request: { body: { name: "Updated Name", test: "Test data" } },
+      body: {},
+    } as unknown as Koa.Context;
+    await SensorsController.update(ctx);
+
+    assert.deepEqual(ctx.body, { id: 1, name: "Updated Name" });
+  });
+
   it("should delete sensors correctly", async () => {
     if (!SensorsController.delete) {
       assert.fail("SensorsController.delete not implemented");
