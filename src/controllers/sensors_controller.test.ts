@@ -4,7 +4,8 @@ import { beforeEach, describe, it } from "node:test";
 import { database } from "../database";
 import { SensorsController } from "./sensors_controller";
 import { SensorsRepository } from "../repositories/sensors_repository";
-import { SensorValuesRepository } from "../repositories/sensor_values_repository";
+import { SensorValue, SensorValuesRepository } from "../repositories/sensor_values_repository";
+import { mean } from "../utils/mean";
 
 describe("SensorsController", () => {
   beforeEach(() => {
@@ -16,16 +17,18 @@ describe("SensorsController", () => {
       assert.fail("SensorsController.read not implemented");
     }
     SensorsRepository.create({ name: "Sensor Name" });
-    SensorValuesRepository.create({
+    const sensorValue1 = {
       timestamp: 123456789,
       sensor_id: 1,
       values: [1, 2, 3],
-    });
-    SensorValuesRepository.create({
+    }
+    const sensorValue2 = {
       timestamp: 123456790,
       sensor_id: 1,
       values: [5, 4, 3],
-    });
+    }
+    SensorValuesRepository.create(sensorValue1);
+    SensorValuesRepository.create(sensorValue2);
 
     const ctx = { params: { id: 1 }, body: {} } as unknown as Koa.Context;
     await SensorsController.read(ctx);
@@ -34,18 +37,8 @@ describe("SensorsController", () => {
       id: 1,
       name: "Sensor Name",
       values: [
-        {
-          id: 1,
-          sensor_id: 1,
-          timestamp: 123456789,
-          values: [1, 2, 3],
-        },
-        {
-          id: 2,
-          timestamp: 123456790,
-          sensor_id: 1,
-          values: [5, 4, 3],
-        },
+        [sensorValue1.timestamp, mean(sensorValue1.values)],
+        [sensorValue2.timestamp, mean(sensorValue2.values)]
       ],
     });
   });
